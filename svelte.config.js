@@ -6,7 +6,9 @@ const config = {
 	kit: {
 		adapter: adapter({}),
 	},
-	preprocess: sveltePreprocess(),
+	preprocess: sveltePreprocess({
+		postcss: true,
+	}),
 };
 
 export default config;
