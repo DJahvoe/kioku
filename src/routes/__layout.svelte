@@ -1,22 +1,17 @@
 <script lang="ts">
+	import '../global.css';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores';
+	import Toast from '$lib/components/Toast.svelte';
 
 	let ready: boolean = false;
 	onMount(() => (ready = true));
 </script>
 
-<div class="dragbar" />
+{#if $toast.isShowing}
+	<Toast />
+{/if}
 
 {#if ready}
 	<slot />
 {/if}
-
-<style>
-	.dragbar {
-		-webkit-app-region: drag;
-		position: absolute;
-		z-index: 100;
-		height: 40px;
-		width: 100%;
-	}
-</style>

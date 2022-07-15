@@ -1,9 +1,14 @@
 <script lang="ts">
-	import Counter from '$lib/Counter.svelte';
-	import Logo from '$lib/Logo.svelte';
 	import { browser } from '$app/env';
 
+	import Fa from 'svelte-fa';
+	import { faBookOpen, faList, faPlus } from '@fortawesome/free-solid-svg-icons/index';
+	import Tooltip from '$lib/components/Tooltip.svelte';
+	import DeckBadge from '$lib/components/DeckBadge.svelte';
+	import DeckTitle from '$lib/components/DeckTitle.svelte';
+
 	let desktop: string;
+	// console.log(window.electron);
 
 	if (window.electron && browser) {
 		window.electron.receive('from-main', (data: any) => {
@@ -11,48 +16,42 @@
 			console.log(desktop);
 		});
 	}
-
-	const agent = window.electron ? 'Electron' : 'Browser';
 </script>
 
-<main>
-	<Logo />
-
-	<h1>Hello {agent}!</h1>
-
-	<Counter id="0" {agent} />
-
-	{#if desktop}
-		<br />
-		<br />
-		{desktop}
-	{/if}
+<main class="p-10 flex flex-col justify-center items-center gap-4">
+	<DeckTitle />
+	<div class="flex justify-center items-center gap-4 mb-4">
+		<DeckBadge title="New" color="red" count={12} />
+		<DeckBadge title="Learning" color="yellow" count={12} />
+		<DeckBadge title="Due" color="green" count={12} />
+	</div>
+	<div class="flex justify-center">
+		<img class="object-cover h-48 tall:h-80" src="/KiokuLogo.png" alt="Kioku Logo" />
+	</div>
+	<div class="flex justify-center gap-8 my-9">
+		<Tooltip text="Study">
+			<a href="/study" class="icon-button">
+				<Fa icon={faBookOpen} />
+			</a>
+		</Tooltip>
+		<Tooltip text="List">
+			<a href="/list" class="icon-button">
+				<Fa icon={faList} />
+			</a>
+		</Tooltip>
+		<Tooltip text="Add Card">
+			<a href="/add" class="icon-button">
+				<Fa icon={faPlus} />
+			</a>
+		</Tooltip>
+	</div>
 </main>
 
 <style>
-	:root {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-			Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	.icon-button {
+		@apply flex justify-center w-20 border-2 border-sky-500 rounded-md text-4xl bg-transparent text-sky-500  p-4 transition-all duration-100 ease-in cursor-pointer;
 	}
-
-	:global(body) {
-		margin: 0;
-		padding: 0;
-	}
-
-	main {
-		padding: 2em 1em 1em 1em;
-		text-align: center;
-		animation: fade 1s;
-		margin: 0 auto;
-	}
-
-	@keyframes fade {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
+	.icon-button:hover {
+		@apply bg-sky-500 text-white;
 	}
 </style>

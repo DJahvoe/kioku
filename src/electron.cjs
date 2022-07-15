@@ -3,14 +3,15 @@ const contextMenu = require('electron-context-menu');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const serve = require('electron-serve');
 const path = require('path');
+const api = require('./kioku-api.cjs');
 
 try {
-	require('electron-reloader')(module);
+	require('electron-reloader')(module, { ignore: /(.*).json/g });
 } catch (e) {
 	console.error(e);
 }
 
-const serveURL = serve({ directory: "." });
+const serveURL = serve({ directory: '.' });
 const port = process.env.PORT || 3000;
 const dev = !app.isPackaged;
 let mainWindow;
@@ -20,10 +21,11 @@ function createWindow() {
 		defaultWidth: 800,
 		defaultHeight: 600,
 	});
-	
+
 	const mainWindow = new BrowserWindow({
 		backgroundColor: 'whitesmoke',
-		titleBarStyle: 'hidden',
+		// titleBarStyle: 'hidden',
+		icon: './KiokuLogo.ico',
 		autoHideMenuBar: true,
 		trafficLightPosition: {
 			x: 17,
@@ -37,7 +39,7 @@ function createWindow() {
 			nodeIntegration: true,
 			spellcheck: false,
 			devTools: dev,
-			preload: path.join(__dirname, "preload.cjs")
+			preload: path.join(__dirname, 'preload.cjs'),
 		},
 		x: windowState.x,
 		y: windowState.y,
@@ -65,7 +67,7 @@ contextMenu({
 	showCopyImage: false,
 	prepend: (defaultActions, params, browserWindow) => [
 		{
-			label: 'Make App 💻',
+			label: 'Kioku',
 		},
 	],
 });
@@ -81,7 +83,9 @@ function loadVite(port) {
 
 function createMainWindow() {
 	mainWindow = createWindow();
-	mainWindow.once('close', () => { mainWindow = null });
+	mainWindow.once('close', () => {
+		mainWindow = null;
+	});
 
 	if (dev) loadVite(port);
 	else serveURL(mainWindow);
@@ -97,6 +101,15 @@ app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.on('to-main', (event, count) => {
-	return mainWindow.webContents.send('from-main', `next count is ${count+1}`);
-  })
+ipcMain.on('to-main', (event, payload) => {
+	switch (payload.type) {
+		case 'ADD':
+			api.createCard(payload.data);
+			return mainWindow.webContents.send('from-main', {
+				statusCode: 200,
+				message: 'Card succesfully added!',
+			});
+			break;
+	}
+	// return mainWindow.webContents.send('from-main', `next count is ${data + 1}`);
+});
