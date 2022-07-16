@@ -16,7 +16,6 @@ export function createToastStore() {
 	});
 
 	const toast = derived<Writable<Toast>, Toast>(_toast, ($_toast, set) => {
-		console.log($_toast);
 		set($_toast);
 		if ($_toast.isShowing) {
 			const timer = setTimeout(() => {

@@ -3,7 +3,7 @@ const contextMenu = require('electron-context-menu');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const serve = require('electron-serve');
 const path = require('path');
-const api = require('./kioku-api.cjs');
+const api = require('./kioku-api/index.cjs');
 
 try {
 	require('electron-reloader')(module, { ignore: /(.*).json/g });
@@ -91,7 +91,10 @@ function createMainWindow() {
 	else serveURL(mainWindow);
 }
 
-app.once('ready', createMainWindow);
+app.once('ready', () => {
+	createMainWindow();
+	api.syncDueCard();
+});
 app.on('activate', () => {
 	if (!mainWindow) {
 		createMainWindow();
@@ -101,15 +104,31 @@ app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.on('to-main', (event, payload) => {
-	switch (payload.type) {
-		case 'ADD':
-			api.createCard(payload.data);
-			return mainWindow.webContents.send('from-main', {
-				statusCode: 200,
-				message: 'Card succesfully added!',
-			});
-			break;
+ipcMain.on('SVELTE-ADD', (event, payload) => {
+	api.createCard(payload.data);
+	return mainWindow.webContents.send('ELECTRON-ADD', {
+		statusCode: 200,
+		message: 'Card succesfully added!',
+		data: {},
+	});
+});
+
+ipcMain.on('SVELTE-GET', (event, payload) => {
+	let cards;
+	if (payload.data.id) {
+		cards = api.getCard(payload.data.id);
+	} else if (payload.data.studyMode) {
+		cards = api.getStudyCards();
+	} else {
+		cards = api.getAllCards();
 	}
-	// return mainWindow.webContents.send('from-main', `next count is ${data + 1}`);
+	return mainWindow.webContents.send('ELECTRON-GET', {
+		statusCode: 200,
+		message: 'Cards succesfully retrieved!',
+		data: cards,
+	});
+});
+
+ipcMain.on('SVELTE-STUDY', (event, payload) => {
+	api.studyCard(payload.data.id, payload.data.quality);
 });

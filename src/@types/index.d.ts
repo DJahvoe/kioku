@@ -6,7 +6,7 @@ interface Card {
 	easinessFactor: number;
 	intervalInDays: number;
 	dueTimestamp: Date;
-	status: 'new' | 'learning' | 'review' | 'mastered';
+	status: 'new' | 'learning' | 'due' | 'seen';
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -14,6 +14,7 @@ interface Card {
 interface PayloadRespond {
 	statusCode: number;
 	message: string;
+	data?: any;
 }
 
 interface KiokuAPI {

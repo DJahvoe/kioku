@@ -1,21 +1,10 @@
 <script lang="ts">
-	import { browser } from '$app/env';
-
 	import Fa from 'svelte-fa';
 	import { faBookOpen, faList, faPlus } from '@fortawesome/free-solid-svg-icons/index';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import DeckBadge from '$lib/components/DeckBadge.svelte';
 	import DeckTitle from '$lib/components/DeckTitle.svelte';
 
-	let desktop: string;
-	// console.log(window.electron);
-
-	if (window.electron && browser) {
-		window.electron.receive('from-main', (data: any) => {
-			desktop = `Received Message "${data}" from Electron`;
-			console.log(desktop);
-		});
-	}
 </script>
 
 <main class="p-10 flex flex-col justify-center items-center gap-4">
@@ -26,7 +15,7 @@
 		<DeckBadge title="Due" color="green" count={12} />
 	</div>
 	<div class="flex justify-center">
-		<img class="object-cover h-48 tall:h-80" src="/KiokuLogo.png" alt="Kioku Logo" />
+		<img class="object-cover h-64 tall:h-80" src="/KiokuLogo.png" alt="Kioku Logo" />
 	</div>
 	<div class="flex justify-center gap-8 my-9">
 		<Tooltip text="Study">

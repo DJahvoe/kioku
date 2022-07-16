@@ -7,15 +7,14 @@
 		e.preventDefault();
 
 		if (window.electron) {
-			window.electron.send('to-main', {
-				type: 'ADD',
+			window.electron.send('SVELTE-ADD', {
 				data: {
 					frontFace,
 					backFace,
 				},
 			});
 
-			window.electron.receive('from-main', (payload: PayloadRespond) => {
+			window.electron.receive('ELECTRON-ADD', (payload: PayloadRespond) => {
 				toast.send(payload.message);
 			});
 		}
@@ -31,7 +30,9 @@
 	let backFace: string;
 </script>
 
-<EscButton />
+<div class="absolute top-4 left-4">
+	<EscButton />
+</div>
 <main class="p-10 flex flex-col justify-center items-center gap-4">
 	<DeckTitle />
 	<div class="bg-white opacity-25 w-screen h-1" />
