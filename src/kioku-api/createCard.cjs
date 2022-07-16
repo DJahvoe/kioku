@@ -1,10 +1,9 @@
 const fs = require('fs');
 const uuid = require('uuid');
+const init = require('./util/init.cjs');
 
 const createCard = (card) => {
-	if (!fs.existsSync('kioku-default.json')) {
-		fs.writeFileSync('kioku-default.json', JSON.stringify([]));
-	}
+	init();
 
 	const cards = JSON.parse(fs.readFileSync('kioku-default.json'));
 	cards.push({
@@ -22,8 +21,4 @@ const createCard = (card) => {
 	fs.writeFileSync('kioku-default.json', JSON.stringify(cards));
 };
 
-const api = {
-	createCard,
-};
-
-module.exports = api;
+module.exports = createCard;
