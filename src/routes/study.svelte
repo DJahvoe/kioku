@@ -2,9 +2,8 @@
 	import ArrowButton from '$lib/components/ArrowButton.svelte';
 	import DeckSideTitle from '$lib/components/DeckSideTitle.svelte';
 	import EscButton from '$lib/components/EscButton.svelte';
-	import KiokuCard from '$lib/components/KiokuCard.svelte';
+	import KiokuStudyCard from '$lib/components/KiokuStudyCard.svelte';
 	import ToggleTextButton from '$lib/components/ToggleTextButton.svelte';
-	import { onMount } from 'svelte';
 
 	function arrowUpHandler() {
 		isFlipped = !isFlipped;
@@ -52,6 +51,7 @@
 		currentCard = cards[0];
 	}
 	$: isStudyNotFinished = cards.length > 0;
+	
 	getStudyCards();
 </script>
 
@@ -93,7 +93,11 @@
 
 <main>
 	{#if isStudyNotFinished}
-		<KiokuCard frontFace={currentCard.frontFace} backFace={currentCard.backFace} {isFlipped} />
+		<KiokuStudyCard
+			frontFace={currentCard.frontFace}
+			backFace={currentCard.backFace}
+			{isFlipped}
+		/>
 	{:else}
 		<div
 			class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center text-white text-4xl"

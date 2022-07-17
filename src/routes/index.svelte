@@ -2,18 +2,13 @@
 	import Fa from 'svelte-fa';
 	import { faBookOpen, faList, faPlus } from '@fortawesome/free-solid-svg-icons/index';
 	import Tooltip from '$lib/components/Tooltip.svelte';
-	import DeckBadge from '$lib/components/DeckBadge.svelte';
 	import DeckTitle from '$lib/components/DeckTitle.svelte';
-
+	import DeckCardStatus from '$lib/components/DeckCardStatus.svelte';
 </script>
 
 <main class="p-10 flex flex-col justify-center items-center gap-4">
 	<DeckTitle />
-	<div class="flex justify-center items-center gap-4 mb-4">
-		<DeckBadge title="New" color="red" count={12} />
-		<DeckBadge title="Learning" color="yellow" count={12} />
-		<DeckBadge title="Due" color="green" count={12} />
-	</div>
+	<DeckCardStatus />
 	<div class="flex justify-center">
 		<img class="object-cover h-64 tall:h-80" src="/KiokuLogo.png" alt="Kioku Logo" />
 	</div>

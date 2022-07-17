@@ -1,12 +1,14 @@
 <script lang="ts">
-	export let title: string;
-	export let count: number;
-	export let color: 'red' | 'green' | 'yellow';
+	export let title: string | undefined;
+	export let content: number | string;
+	export let color: 'red' | 'green' | 'yellow' | 'gray';
 </script>
 
 <div class={`flex flex-col justify-center items-center ${color}`}>
-	<p class="uppercase text-xs mb-1">{title}</p>
-	<span class="border-2 py-1 px-2 rounded-lg text-center">{count}</span>
+	{#if title}
+		<p class="uppercase text-xs mb-1">{title}</p>
+	{/if}
+	<span class="border-2 py-1 px-2 rounded-lg text-center">{content}</span>
 </div>
 
 <style>
@@ -37,5 +39,12 @@
 	}
 	.green span {
 		@apply text-green-500 border-green-500;
+	}
+
+	.gray p {
+		@apply text-gray-500;
+	}
+	.gray span {
+		@apply text-gray-500 border-gray-500;
 	}
 </style>

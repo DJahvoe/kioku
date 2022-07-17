@@ -1,9 +1,10 @@
 const windowStateManager = require('electron-window-state');
 const contextMenu = require('electron-context-menu');
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, globalShortcut } = require('electron');
 const serve = require('electron-serve');
 const path = require('path');
 const api = require('./kioku-api/index.cjs');
+const { Menu } = require('electron/main');
 
 try {
 	require('electron-reloader')(module, { ignore: /(.*).json/g });
@@ -15,6 +16,7 @@ const serveURL = serve({ directory: '.' });
 const port = process.env.PORT || 3000;
 const dev = !app.isPackaged;
 let mainWindow;
+let isQuitting = false;
 
 function createWindow() {
 	let windowState = windowStateManager({
@@ -25,7 +27,7 @@ function createWindow() {
 	const mainWindow = new BrowserWindow({
 		backgroundColor: 'whitesmoke',
 		// titleBarStyle: 'hidden',
-		icon: './KiokuLogo.ico',
+		icon: '/KiokuLogo.ico',
 		autoHideMenuBar: true,
 		trafficLightPosition: {
 			x: 17,
@@ -54,23 +56,22 @@ function createWindow() {
 		mainWindow.focus();
 	});
 
-	mainWindow.on('close', () => {
-		windowState.saveState(mainWindow);
+	mainWindow.on('close', (event) => {
+		if (!isQuitting) {
+			event.preventDefault();
+			mainWindow.hide();
+		}
+
+		return false;
+	});
+
+	mainWindow.on('minimize', (event) => {
+		event.preventDefault();
+		mainWindow.hide();
 	});
 
 	return mainWindow;
 }
-
-contextMenu({
-	showLookUpSelection: false,
-	showSearchWithGoogle: false,
-	showCopyImage: false,
-	prepend: (defaultActions, params, browserWindow) => [
-		{
-			label: 'Kioku',
-		},
-	],
-});
 
 function loadVite(port) {
 	mainWindow.loadURL(`http://localhost:${port}`).catch((e) => {
@@ -91,10 +92,43 @@ function createMainWindow() {
 	else serveURL(mainWindow);
 }
 
-app.once('ready', () => {
+app.whenReady().then(() => {
+	const modalWindow = new BrowserWindow({ show: false, width: 800, height: 600 });
+	globalShortcut.register('Alt+CommandOrControl+K', () => {
+		console.log('SHORTCUT CALLED');
+		if (dev) loadVite(port);
+		else serveURL(modalWindow);
+
+		modalWindow.once('ready-to-show', () => {
+			modalWindow.show();
+			modalWindow.focus();
+		});
+	});
+
+	const tray = new Tray(path.join(__dirname, '../static/KiokuLogo.ico'));
+
+	tray.setContextMenu(
+		Menu.buildFromTemplate([
+			{
+				label: 'Show App',
+				click: () => {
+					mainWindow.show();
+				},
+			},
+			{
+				label: 'Quit',
+				click: () => {
+					isQuitting = true;
+					app.quit();
+				},
+			},
+		]),
+	);
+
 	createMainWindow();
 	api.syncDueCard();
 });
+
 app.on('activate', () => {
 	if (!mainWindow) {
 		createMainWindow();
@@ -115,9 +149,9 @@ ipcMain.on('SVELTE-ADD', (event, payload) => {
 
 ipcMain.on('SVELTE-GET', (event, payload) => {
 	let cards;
-	if (payload.data.id) {
+	if (payload?.data?.id) {
 		cards = api.getCard(payload.data.id);
-	} else if (payload.data.studyMode) {
+	} else if (payload?.data?.studyMode) {
 		cards = api.getStudyCards();
 	} else {
 		cards = api.getAllCards();
