@@ -4,14 +4,16 @@
 	import KiokuCard from '$lib/components/KiokuCard.svelte';
 	import DeckCardStatus from '$lib/components/DeckCardStatus.svelte';
 
-	function getCards() {
-		if (window.electron) {
-			window.electron.send('SVELTE-GET');
+	if (window.electron) {
+		window.electron.send('SVELTE-GET');
 
-			window.electron.receive('ELECTRON-GET', (payload: PayloadRespond) => {
-				cards = payload.data;
-			});
-		}
+		window.electron.receive('ELECTRON-GET', (payload: PayloadRespond) => {
+			cards = payload.data;
+		});
+
+		window.electron.receive('ELECTRON-ADD', (payload: PayloadRespond) => {
+			window.electron.send('SVELTE-GET');
+		});
 	}
 
 	let cards: Card[] = [];
@@ -19,7 +21,6 @@
 	$: filteredCard = cards.filter(
 		(card) => card.frontFace.includes(searchString) || card.backFace.includes(searchString),
 	);
-	getCards();
 </script>
 
 <div class="flex justify-center items-center absolute top-4 left-4 gap-2">
@@ -42,7 +43,7 @@
 			id="card-collection"
 			class="flex flex-col items-center w-3/4 overflow-y-auto gap-4 p-3"
 		>
-			{#each filteredCard as card}
+			{#each filteredCard as card (card.id)}
 				<KiokuCard
 					frontFace={card.frontFace}
 					backFace={card.backFace}

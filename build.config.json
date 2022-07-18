@@ -1,6 +1,6 @@
 {
 	"appId": "com.example.app",
-	"productName": "Svelte Electron",
+	"productName": "Kioku",
 	"directories": {
 		"output": "dist"
 	},
@@ -10,6 +10,15 @@
 		{
 			"from": "build",
 			"to": ""
+		}
+	],
+	"win": {
+		"icon": "KiokuLogo.png"
+	},
+	"extraFiles": [
+		{
+			"from": "src/KiokuLogo.png",
+			"to": "KiokuLogo.png"
 		}
 	]
 }

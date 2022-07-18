@@ -1,9 +1,16 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
+	import { goto } from '$app/navigation';
 	import { faBookOpen, faList, faPlus } from '@fortawesome/free-solid-svg-icons/index';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import DeckTitle from '$lib/components/DeckTitle.svelte';
 	import DeckCardStatus from '$lib/components/DeckCardStatus.svelte';
+
+	if (window.electron) {
+		window.electron.receive('ELECTRON-MODAL', () => {
+			goto('/modal');
+		});
+	}
 </script>
 
 <main class="p-10 flex flex-col justify-center items-center gap-4">
